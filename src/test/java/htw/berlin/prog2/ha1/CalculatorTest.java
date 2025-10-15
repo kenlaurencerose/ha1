@@ -90,5 +90,21 @@ class CalculatorTest {
 
 
     //TODO hier weitere Tests erstellen
+
+    @Test
+    @DisplayName("should show the result after pressing the EqualsKey")
+    void testEqualsKey(){
+        Calculator calc = new Calculator();
+
+        calc.pressDigitKey(6);
+        calc.pressBinaryOperationKey("+");
+        calc.pressDigitKey(4);
+        calc.pressEqualsKey();
+
+        String expected = "10";
+        String actual   = calc.readScreen();
+
+        assertEquals(expected, actual);
+    }
 }
 
