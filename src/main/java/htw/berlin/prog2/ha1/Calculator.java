@@ -1,5 +1,7 @@
 package htw.berlin.prog2.ha1;
 
+import java.sql.SQLOutput;
+
 /**
  * Eine Klasse, die das Verhalten des Online Taschenrechners imitiert, welcher auf
  * https://www.online-calculator.com/ aufgerufen werden kann (ohne die Memory-Funktionen)
@@ -13,6 +15,8 @@ public class Calculator {
     private double latestValue;
 
     private String latestOperation = "";
+
+    private boolean waitingForSecondNumber = false;
 
     /**
      * @return den aktuellen Bildschirminhalt als String
@@ -31,7 +35,18 @@ public class Calculator {
     public void pressDigitKey(int digit) {
         if(digit > 9 || digit < 0) throw new IllegalArgumentException();
 
-        if(screen.equals("0") || latestValue == Double.parseDouble(screen)) screen = "";
+        if(screen.equals("Error")){
+            return;
+        }
+
+        if (waitingForSecondNumber == true){
+            screen = "";
+            waitingForSecondNumber = false;
+        }
+
+        if(screen.equals("0") || (!screen.isEmpty()) && latestValue == Double.parseDouble(screen)){
+            screen = "";
+        }
 
         screen = screen + digit;
     }
@@ -45,9 +60,13 @@ public class Calculator {
      * im Ursprungszustand ist.
      */
     public void pressClearKey() {
-        screen = "0";
-        latestOperation = "";
-        latestValue = 0.0;
+        if(!screen.equals("0")){
+            screen = "0";
+        } else{
+            latestOperation = "";
+            latestValue = 0.0;
+            waitingForSecondNumber = false;
+        }
     }
 
     /**
@@ -59,9 +78,21 @@ public class Calculator {
      * auf dem Bildschirm angezeigt. Falls hierbei eine Division durch Null auftritt, wird "Error" angezeigt.
      * @param operation "+" für Addition, "-" für Substraktion, "x" für Multiplikation, "/" für Division
      */
-    public void pressBinaryOperationKey(String operation)  {
+    public void pressBinaryOperationKey(String operation) {
+
+        if(screen.equals("Error")){
+            return;
+        }
+        if (waitingForSecondNumber == true){
+            screen = "Error";
+            latestOperation = "";
+            latestValue = 0.0;
+            waitingForSecondNumber = false;
+            return;
+        }
         latestValue = Double.parseDouble(screen);
         latestOperation = operation;
+        waitingForSecondNumber = true;
     }
 
     /**
