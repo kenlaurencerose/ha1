@@ -1,6 +1,5 @@
 package htw.berlin.prog2.ha1;
 
-import java.sql.SQLOutput;
 
 /**
  * Eine Klasse, die das Verhalten des Online Taschenrechners imitiert, welcher auf
